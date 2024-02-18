@@ -1,5 +1,6 @@
 import unittest
-from graphics import Maze, Point
+from graphics import Point
+from maze import Maze
 
 class Tests(unittest.TestCase):
     def test_maze_create_cells_params1(self):
