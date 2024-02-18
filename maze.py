@@ -16,28 +16,29 @@ class Maze:
 
         if seed:
             random.seed(seed)
+        self._break_walls_r(0,1)
+        self._reset_cells_visited()
 
         # Draw window into UI
         if self._window:
-            self._break_walls_r(0,1)
-            self._draw_cells(self._cells)
+            self._draw_cells()
     
     def _create_cells(self):
         cells = []
-        for r in range(self._num_rows):
-            columns = []
-            for c in range(self._num_cols):
+        for r in range(self._num_cols):
+            row = []
+            for c in range(self._num_rows):
                 x1 = self._tl.x + self._cell_size_x * c
                 y1 = self._tl.y + self._cell_size_y * r
                 x2 = x1 + self._cell_size_x
                 y2 = y1 + self._cell_size_y
-                columns += [Cell(Point(x1, y1), Point(x2, y2), self._window)]
-            cells += [columns]
+                row += [Cell(Point(x1, y1), Point(x2, y2), self._window)]
+            cells += [row]
         return cells   
     
-    def _draw_cells(self, cells):
-        for columns in cells:
-            for cell in columns:
+    def _draw_cells(self):
+        for row in self._cells:
+            for cell in row:
                 cell.draw()
                 self._animate()
     
@@ -47,7 +48,7 @@ class Maze:
     
     def _break_entrance_and_exit(self):
         self._cells[0][0].top_wall = False
-        self._cells[self._num_rows-1][self._num_cols-1].bottom_wall = False
+        self._cells[self._num_cols-1][self._num_rows-1].bottom_wall = False
     
     def _break_walls_r(self, i, j):
         self._cells[i][j].visited = True
@@ -63,7 +64,6 @@ class Maze:
             if i < self._num_cols - 1 and not self._cells[i+1][j].visited: 
                 to_visit += ["bottom"]
             if not to_visit:
-                #self._cells[i][j].draw()
                 return
             
             # Move in direction
@@ -85,3 +85,8 @@ class Maze:
                     self._cells[i][j].bottom_wall = False
                     self._cells[i + 1][j].top_wall = False
                     self._break_walls_r(i + 1, j)
+
+    def _reset_cells_visited(self):
+        for row in self._cells:
+            for cell in row:
+                cell.visited = False

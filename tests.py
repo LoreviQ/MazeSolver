@@ -15,11 +15,11 @@ class Tests(unittest.TestCase):
         #Test
         self.assertEqual(
             len(m1._cells),
-            num_rows,
+            num_cols,
         )
         self.assertEqual(
             len(m1._cells[0]),
-            num_cols,
+            num_rows,
         )
         self.assertEqual(
             m1._cells[0][0]._tr.x - m1._cells[0][0]._tl.x,
@@ -54,11 +54,11 @@ class Tests(unittest.TestCase):
         #Test
         self.assertEqual(
             len(m1._cells),
-            num_rows,
+            num_cols,
         )
         self.assertEqual(
             len(m1._cells[0]),
-            num_cols,
+            num_rows,
         )
         self.assertEqual(
             m1._cells[0][0]._tr.x - m1._cells[0][0]._tl.x,
@@ -96,7 +96,7 @@ class Tests(unittest.TestCase):
             False
         )
         self.assertEqual(
-            m1._cells[19][24].bottom_wall,
+            m1._cells[24][19].bottom_wall,
             False
         )
 
