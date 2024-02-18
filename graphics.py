@@ -11,7 +11,11 @@ class Maze:
         self._cell_size_y = cell_size_y
         self._window = window
         self._cells = self._create_cells()
-        #self._draw_cells(self._cells)
+        self._break_entrance_and_exit()
+
+        # Draw window into UI
+        if self._window:
+            self._draw_cells(self._cells)
     
     def _create_cells(self):
         cells = []
@@ -35,8 +39,10 @@ class Maze:
     def _animate(self):
         self._window.redraw()
         time.sleep(0.05)
-
-
+    
+    def _break_entrance_and_exit(self):
+        self._cells[0][0].top_wall = False
+        self._cells[self._num_rows-1][self._num_cols-1].bottom_wall = False
 
 # Class for cells
 class Cell:
@@ -54,24 +60,30 @@ class Cell:
     # Generates a line for each wall then draws it
     def draw(self):
         lines = []
-        if self.left_wall:
-            lines += [Line(self._tl, self._bl)]
-        if self.right_wall:
-            lines += [Line(self._tr, self._br)]
-        if self.top_wall:
-            lines += [Line(self._tl, self._tr)]
-        if self.bottom_wall:
-            lines += [Line(self._bl, self._br)]
-        if lines:
-            for line in lines:
-                self._window.draw_line(line)
+        colors = []
+
+        lines += [Line(self._tl, self._bl)] # left line
+        lines += [Line(self._tr, self._br)] # right line
+        lines += [Line(self._tl, self._tr)] # top line
+        lines += [Line(self._bl, self._br)] # bottom line
+
+        # sets colours
+        for wall in [self.left_wall, self.right_wall, self.top_wall, self.bottom_wall]:
+            if wall:
+                colors += ["black"]
+            else:
+                colors += ['#FFFFFF']
+
+        drawables = zip(lines, colors)
+        for drawable in drawables:
+            self._window.draw_line(drawable[0], drawable[1])
     
     # Draws a path between the centre of two cells
     def draw_move(self, to_cell, undo=False):
         c1 = Point((self._tl.x+self._br.x)/2, (self._tl.y+self._br.y)/2)
         c2 = Point((to_cell._tl.x+to_cell._br.x)/2, (to_cell._tl.y+to_cell._br.y)/2)
         if undo:
-            color = "grey"
+            color = '#FFFFFF'
         else:
             color = "red"
         self._window.draw_line(Line(c1,c2), color)
@@ -104,6 +116,7 @@ class Window:
         self.__root.title(TITLE)
         self.__root.protocol("WM_DELETE_WINDOW", self.close)
         self.__canvas = Canvas()
+        self.__canvas.configure(background='#FFFFFF')
         self.__canvas.pack(fill=BOTH, expand=1)
         self.__running = False
     

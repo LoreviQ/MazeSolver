@@ -80,5 +80,24 @@ class Tests(unittest.TestCase):
             p1.x + 2*width
         )
 
+    def test_entrance_exit(self):
+        #PARAMS
+        p1 = Point(100,100)
+        num_cols = 25
+        num_rows = 20
+        width = 50
+        height = 25
+        m1 = Maze(p1, num_rows, num_cols, width, height)
+    
+        #Test
+        self.assertEqual(
+            m1._cells[0][0].top_wall,
+            False
+        )
+        self.assertEqual(
+            m1._cells[19][24].bottom_wall,
+            False
+        )
+
 if __name__ == "__main__":
     unittest.main()
