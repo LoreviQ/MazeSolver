@@ -1,5 +1,33 @@
 from tkinter import Tk, BOTH, Canvas
 
+# Class for cells
+class Cell:
+    def __init__(self, p1, p2, window, left_wall=True, right_wall=True, top_wall=True, bottom_wall=True,):
+        self._tl = Point(min(p1.x, p2.x), min(p1.y, p2.y)) # Top Left point
+        self._tr = Point(max(p1.x, p2.x), min(p1.y, p2.y)) # Top Right point
+        self._br = Point(max(p1.x, p2.x), max(p1.y, p2.y)) # Bottom Right point
+        self._bl = Point(min(p1.x, p2.x), max(p1.y, p2.y)) # Bottom Left point
+        self._window = window
+        self.left_wall = left_wall
+        self.right_wall = right_wall
+        self.top_wall = top_wall
+        self.bottom_wall = bottom_wall
+    
+    # Generates a line for each wall then draws it
+    def draw(self):
+        lines = []
+        if self.left_wall:
+            lines += [Line(self._tl, self._bl)]
+        if self.right_wall:
+            lines += [Line(self._tr, self._br)]
+        if self.top_wall:
+            lines += [Line(self._tl, self._tr)]
+        if self.bottom_wall:
+            lines += [Line(self._bl, self._br)]
+        if lines:
+            for line in lines:
+                self._window.draw_line(line)
+
 # Class for point
 class Point:
     def __init__(self, x, y):
@@ -32,7 +60,7 @@ class Window:
         self.__running = False
     
     # Draws line from input
-    def draw_line(self, line, fill_color):
+    def draw_line(self, line, fill_color="black"):
         line.draw(self.__canvas, fill_color)
 
     # Updates window
