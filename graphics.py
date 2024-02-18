@@ -3,7 +3,7 @@ import time
 
 # Class for maze
 class Maze:
-    def __init__(self, p1, num_rows, num_cols, cell_size_x, cell_size_y, window):
+    def __init__(self, p1, num_rows, num_cols, cell_size_x, cell_size_y, window=None):
         self._tl = p1 # Position of the top left point of the maze
         self._num_rows = num_rows
         self._num_cols = num_cols
@@ -11,6 +11,7 @@ class Maze:
         self._cell_size_y = cell_size_y
         self._window = window
         self._cells = self._create_cells()
+        #self._draw_cells(self._cells)
     
     def _create_cells(self):
         cells = []
@@ -23,7 +24,7 @@ class Maze:
                 y2 = y1 + self._cell_size_y
                 columns += [Cell(Point(x1, y1), Point(x2, y2), self._window)]
             cells += [columns]
-        self._draw_cells(cells)
+        return cells   
     
     def _draw_cells(self, cells):
         for columns in cells:
@@ -39,7 +40,7 @@ class Maze:
 
 # Class for cells
 class Cell:
-    def __init__(self, p1, p2, window, left_wall=True, right_wall=True, top_wall=True, bottom_wall=True,):
+    def __init__(self, p1, p2, window=None, left_wall=True, right_wall=True, top_wall=True, bottom_wall=True,):
         self._tl = Point(min(p1.x, p2.x), min(p1.y, p2.y)) # Top Left point
         self._tr = Point(max(p1.x, p2.x), min(p1.y, p2.y)) # Top Right point
         self._br = Point(max(p1.x, p2.x), max(p1.y, p2.y)) # Bottom Right point
