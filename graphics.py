@@ -12,6 +12,7 @@ class Cell:
         self.right_wall = right_wall
         self.top_wall = top_wall
         self.bottom_wall = bottom_wall
+        self.visited = False
     
     # Generates a line for each wall then draws it
     def draw(self):
