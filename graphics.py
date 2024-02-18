@@ -27,6 +27,16 @@ class Cell:
         if lines:
             for line in lines:
                 self._window.draw_line(line)
+    
+    # Draws a path between the centre of two cells
+    def draw_move(self, to_cell, undo=False):
+        c1 = Point((self._tl.x+self._br.x)/2, (self._tl.y+self._br.y)/2)
+        c2 = Point((to_cell._tl.x+to_cell._br.x)/2, (to_cell._tl.y+to_cell._br.y)/2)
+        if undo:
+            color = "grey"
+        else:
+            color = "red"
+        self._window.draw_line(Line(c1,c2), color)
 
 # Class for point
 class Point:
