@@ -1,6 +1,7 @@
 import unittest
 from graphics import Point
 from maze import Maze
+import random
 
 class Tests(unittest.TestCase):
     def test_maze_create_cells_params1(self):
@@ -97,6 +98,29 @@ class Tests(unittest.TestCase):
         )
         self.assertEqual(
             m1._cells[24][19].bottom_wall,
+            False
+        )
+
+    def test_reset_visited(self):
+        #PARAMS
+        p1 = Point(100,100)
+        num_cols = 25
+        num_rows = 20
+        width = 50
+        height = 25
+        m1 = Maze(p1, num_rows, num_cols, width, height)
+    
+        #Test
+        self.assertEqual(
+            m1._cells[random.randint(0, num_cols-1)][random.randint(0, num_rows-1)].visited,
+            False
+        )
+        self.assertEqual(
+            m1._cells[random.randint(0, num_cols-1)][random.randint(0, num_rows-1)].visited,
+            False
+        )
+        self.assertEqual(
+            m1._cells[random.randint(0, num_cols-1)][random.randint(0, num_rows-1)].visited,
             False
         )
 
