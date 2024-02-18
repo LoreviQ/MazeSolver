@@ -1,6 +1,8 @@
 import time
 from graphics import Cell, Point
 import random
+import sys 
+
 
 # Class for maze
 class Maze:
@@ -22,12 +24,13 @@ class Maze:
         # Draw window into UI
         if self._window:
             self._draw_cells()
+            self.solve()
     
     def _create_cells(self):
         cells = []
-        for r in range(self._num_cols):
+        for r in range(self._num_rows):
             row = []
-            for c in range(self._num_rows):
+            for c in range(self._num_cols):
                 x1 = self._tl.x + self._cell_size_x * c
                 y1 = self._tl.y + self._cell_size_y * r
                 x2 = x1 + self._cell_size_x
@@ -40,53 +43,114 @@ class Maze:
         for row in self._cells:
             for cell in row:
                 cell.draw()
-                self._animate()
     
     def _animate(self):
         self._window.redraw()
-        time.sleep(0.01)
+        time.sleep(0.02)
     
     def _break_entrance_and_exit(self):
         self._cells[0][0].top_wall = False
-        self._cells[self._num_cols-1][self._num_rows-1].bottom_wall = False
+        self._cells[self._num_rows-1][self._num_cols-1].bottom_wall = False
     
-    def _break_walls_r(self, i, j):
-        self._cells[i][j].visited = True
+    def _break_walls_r(self, row, column):
+        cells = self._get_adjacent_cells(row, column)
+
+        cells["this"].visited = True 
         while True:
             # Check Directions
-            to_visit = []
-            if j > 0 and not self._cells[i][j-1].visited:
-                to_visit += ["left"]
-            if j < self._num_rows - 1 and not self._cells[i][j+1].visited:
-                to_visit += ["right"]
-            if i > 0 and not self._cells[i-1][j].visited: 
-                to_visit += ["top"]
-            if i < self._num_cols - 1 and not self._cells[i+1][j].visited: 
-                to_visit += ["bottom"]
-            if not to_visit:
-                return
+            try:
+                to_visit = []
+                if cells["left"] and not cells["left"].visited:
+                    to_visit += ["left"]
+                if cells["right"] and not cells["right"].visited:
+                    to_visit += ["right"]
+                if cells["top"] and not cells["top"].visited: 
+                    to_visit += ["top"]
+                if cells["bottom"] and not cells["bottom"].visited: 
+                    to_visit += ["bottom"]
+                if not to_visit:
+                    return
+            except:
+                print(self._cells)
+                print(cells)
+                sys.exit()
             
             # Move in direction
             direction = random.choice(to_visit)
             match direction:
                 case "left":
-                    self._cells[i][j].left_wall = False
-                    self._cells[i][j - 1].right_wall = False
-                    self._break_walls_r(i, j - 1)
+                    cells["this"].left_wall = False
+                    cells[direction].right_wall = False
+                    self._break_walls_r(row, column - 1)
                 case "right":
-                    self._cells[i][j].right_wall = False
-                    self._cells[i][j + 1].left_wall = False
-                    self._break_walls_r(i, j + 1)
+                    cells["this"].right_wall = False
+                    cells[direction].left_wall = False
+                    self._break_walls_r(row, column + 1)
                 case "top":
-                    self._cells[i][j].top_wall = False
-                    self._cells[i - 1][j].bottom_wall = False
-                    self._break_walls_r(i - 1, j)
+                    cells["this"].top_wall = False
+                    cells[direction].bottom_wall = False
+                    self._break_walls_r(row - 1, column)
                 case "bottom":
-                    self._cells[i][j].bottom_wall = False
-                    self._cells[i + 1][j].top_wall = False
-                    self._break_walls_r(i + 1, j)
+                    cells["this"].bottom_wall = False
+                    cells[direction].top_wall = False
+                    self._break_walls_r(row + 1, column)
+
+    def _get_adjacent_cells(self, row, column):
+        cells = {"this": self._cells[row][column],}
+        if column > 0:
+            cells["left"] = self._cells[row][column-1]
+        if column < self._num_cols - 1:
+            cells["right"] = self._cells[row][column+1],
+        if row > 0: 
+            cells["top"] = self._cells[row-1][column]
+        if row < self._num_rows - 1: 
+            cells["bottom"] = self._cells[row+1][column]
+
+        for direction in ["left", "right", "top", "bottom"]:
+            if direction not in cells:
+                cells[direction] = None
+
+        for key in cells:
+            if type(cells[key]) is tuple:
+                cells[key] = cells[key][0]
+
+        return cells
 
     def _reset_cells_visited(self):
         for row in self._cells:
             for cell in row:
                 cell.visited = False
+    
+    def solve(self):
+        self._solve_r(0,0)
+    
+    def _solve_r(self, row, column):
+        self._animate()
+        cells = self._get_adjacent_cells(row, column)
+
+        cells["this"].visited = True
+        if row == self._num_rows - 1 and column == self._num_cols - 1:
+            return True
+        
+        if cells["left"] and not cells["left"].visited and not cells["this"].left_wall and not cells["left"].right_wall:
+            cells["this"].draw_move(cells["left"])
+            if self._solve_r(row, column-1):
+                return True
+            cells["this"].draw_move(cells["left"], undo=True)
+        if cells["right"] and not cells["right"].visited and not cells["this"].right_wall and not cells["right"].left_wall:
+            cells["this"].draw_move(cells["right"])
+            if self._solve_r(row, column+1):
+                return True
+            cells["this"].draw_move(cells["right"], undo=True)
+        if cells["top"] and not cells["top"].visited and not cells["this"].top_wall and not cells["top"].bottom_wall:
+            cells["this"].draw_move(cells["top"])
+            if self._solve_r(row-1, column):
+                return True
+            cells["this"].draw_move(cells["top"], undo=True)
+        if cells["bottom"] and not cells["bottom"].visited and not cells["this"].bottom_wall and not cells["bottom"].top_wall:
+            cells["this"].draw_move(cells["bottom"])
+            if self._solve_r(row+1, column):
+                return True
+            cells["this"].draw_move(cells["bottom"], undo=True)
+        
+        return False
