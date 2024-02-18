@@ -1,4 +1,41 @@
 from tkinter import Tk, BOTH, Canvas
+import time
+
+# Class for maze
+class Maze:
+    def __init__(self, p1, num_rows, num_cols, cell_size_x, cell_size_y, window):
+        self._tl = p1 # Position of the top left point of the maze
+        self._num_rows = num_rows
+        self._num_cols = num_cols
+        self._cell_size_x = cell_size_x
+        self._cell_size_y = cell_size_y
+        self._window = window
+        self._cells = self._create_cells()
+    
+    def _create_cells(self):
+        cells = []
+        for r in range(self._num_rows):
+            columns = []
+            for c in range(self._num_cols):
+                x1 = self._tl.x + self._cell_size_x * c
+                y1 = self._tl.y + self._cell_size_y * r
+                x2 = x1 + self._cell_size_x
+                y2 = y1 + self._cell_size_y
+                columns += [Cell(Point(x1, y1), Point(x2, y2), self._window)]
+            cells += [columns]
+        self._draw_cells(cells)
+    
+    def _draw_cells(self, cells):
+        for columns in cells:
+            for cell in columns:
+                cell.draw()
+                self._animate()
+    
+    def _animate(self):
+        self._window.redraw()
+        time.sleep(0.05)
+
+
 
 # Class for cells
 class Cell:
